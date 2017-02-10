@@ -1,4 +1,4 @@
-package snowflakes
+package snowflakes // import "iris.arke.works/forum/snowflakes"
 
 import (
 	"errors"

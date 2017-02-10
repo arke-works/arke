@@ -1,0 +1,18 @@
+description: "Create Groups Table"
+depends_on:
+  - nothing
+sql:
+  postgres: |
+    CREATE TABLE groups (
+      snowflake	bigint		NOT NULL,
+      created_at	timestamptz	NOT NULL	DEFAULT (now() AT TIME ZONE 'utc'),
+      deleted_at	timestamptz,
+
+      name		varchar(1024)	NOT NULL,
+      permission	bytea,
+      parent_id	bigint,
+
+      PRIMARY KEY (snowflake),
+      FOREIGN KEY (parent_id) REFERENCES groups(snowflake),
+      UNIQUE (name)
+    );

@@ -1,0 +1,8 @@
+description: Index PM Tables
+depends_on:
+- db_setup/create_private_messages
+sql:
+  postgres: |
+    CREATE INDEX private_messages_sender_index ON private_messages(sender_id);
+    CREATE INDEX private_messages_compair_index ON private_messages(sender_id, receiver_id);
+    CREATE INDEX private_messages_parent_index ON private_messages(parent_id);

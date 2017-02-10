@@ -1,0 +1,7 @@
+description: Index Many-to-many Topic/Category Relation
+depends_on:
+- db_setup/create_rel_topic_categories
+sql:
+  postgres: |
+    CREATE INDEX rel_topic_categories_topic_index ON rel_topic_categories(topic_id);
+    CREATE INDEX rel_topic_categories_category_index ON rel_topic_categories(category_id);

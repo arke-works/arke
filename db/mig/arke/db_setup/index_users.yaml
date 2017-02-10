@@ -1,0 +1,7 @@
+description: Index Users Table
+depends_on:
+- db_setup/create_users
+sql:
+  postgres: |
+    CREATE INDEX users_username_index ON users(username);
+    CREATE INDEX users_email_index ON users(email);

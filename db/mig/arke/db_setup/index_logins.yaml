@@ -1,0 +1,8 @@
+description: Index Login Table
+depends_on:
+- db_setup/create_logins
+sql:
+  postgres: |
+    CREATE INDEX logins_login_user_index ON logins(user_id);
+    CREATE INDEX logins_type_index ON logins(type);
+    CREATE INDEX logins_identifier_index ON logins(identifier);

@@ -1,0 +1,8 @@
+description: Index Reply Tables
+depends_on:
+- db_setup/create_replies
+sql:
+  postgres: |
+    CREATE INDEX replies_author_index ON replies(author_id);
+    CREATE INDEX replies_parent_index ON replies(parent_id);
+    CREATE INDEX replies_topic_index ON replies(topic_id);

@@ -1,0 +1,12 @@
+description: Create all database tables
+type: target
+depends_on:
+- db_setup/create_categories
+- db_setup/create_groups
+- db_setup/create_logins
+- db_setup/create_private_messages
+- db_setup/create_replies
+- db_setup/create_topics
+- db_setup/create_users
+- db_setup/create_rel_topic_categories
+- db_setup/create_rel_user_groups
