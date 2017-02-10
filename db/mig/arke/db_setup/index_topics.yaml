@@ -1,0 +1,8 @@
+description: Index Topic Table
+depends_on:
+- db_setup/create_topics
+sql:
+  postgres: |
+    CREATE INDEX topics_author_index ON topics(author_id);
+    CREATE INDEX topics_revision_index ON topics(revision);
+    CREATE INDEX topics_id_revision_index ON topics(snowflake, revision);

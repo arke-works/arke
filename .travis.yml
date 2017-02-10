@@ -13,6 +13,15 @@ matrix:
     - go: go1.8rc3
       env: CAN_AFTER_SUCCESS=true
   fast_finish: true
+service:
+  - postgresql
+addons:
+  postgresql: "9.4"
+env:
+  global:
+    - POSTGRES_HOST=localhost
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASS=""
 install:
   - go get github.com/kardianos/govendor github.com/golang/lint/golint
 script:

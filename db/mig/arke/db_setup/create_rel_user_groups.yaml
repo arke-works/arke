@@ -1,0 +1,17 @@
+description: Create Many-to-Many User/Group Relation
+depends_on:
+  - db_setup/create_groups
+  - db_setup/create_users
+sql:
+  postgres: |
+    CREATE TABLE rel_user_groups (
+      user_id		bigint		NOT NULL,
+      group_id	bigint		NOT NULL,
+      created_at	timestamptz	NOT NULL	DEFAULT (now() AT TIME ZONE 'utc'),
+      deleted_at	timestamptz,
+
+      PRIMARY KEY(user_id, group_id),
+      FOREIGN KEY(user_id) REFERENCES users(snowflake),
+      FOREIGN KEY(group_id) REFERENCES groups(snowflake),
+      UNIQUE (user_id, group_id)
+    );

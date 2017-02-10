@@ -1,0 +1,21 @@
+description: Create Replies Table
+depends_on:
+- db_setup/create_users
+- db_setup/create_topics
+sql:
+ postgres: |
+   CREATE TABLE replies (
+      snowflake	bigint		NOT NULL,
+      created_at	timestamptz	NOT NULL	DEFAULT (now() AT TIME ZONE 'utc'),
+      deleted_at	timestamptz,
+
+      author_id	bigint,
+      body		text		NOT NULL,
+      parent_id	bigint,
+      topic_id	bigint		NOT NULL,
+
+      PRIMARY KEY (snowflake),
+      FOREIGN KEY (author_id) REFERENCES users(snowflake),
+      FOREIGN KEY (parent_id) REFERENCES replies(snowflake),
+      FOREIGN KEY (topic_id) REFERENCES topics(snowflake)
+   );

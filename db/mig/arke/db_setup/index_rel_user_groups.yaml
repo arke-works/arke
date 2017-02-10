@@ -1,0 +1,7 @@
+description: Index User-Group Relation Table
+depends_on:
+- db_setup/create_rel_user_groups
+sql:
+  postgres: |
+    CREATE INDEX rel_user_groups_user_index ON rel_user_groups(user_id);
+    CREATE INDEX rel_user_groups_group_index ON rel_user_groups(group_id);

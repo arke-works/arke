@@ -1,0 +1,4 @@
+description: "Arke Default Target"
+type: target
+depends_on:
+  - db_setup

@@ -1,0 +1,7 @@
+description: Index Group Table
+depends_on:
+- db_setup/create_groups
+sql:
+  postgres: |
+    CREATE INDEX groups_name_index ON groups(name);
+    CREATE INDEX groups_parent_index ON groups(parent_id);
