@@ -7,6 +7,7 @@ go:
 matrix:
   allow_failures:
     - go: master
+    - go: 1.8
   fast_finish: true
 install:
   - # Do nothing. This is needed to prevent default install action "go get -t -v ./..." from happening here (we want it to happen inside script step).
