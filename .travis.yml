@@ -19,8 +19,16 @@ script:
   - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 deploy:
   - provider: script
-    script: .travis.deploy.sh
+    script: .travis/always.sh
+    on:
+      condition: $CAN_AFTER_SUCCESS == "true"
+  - provider: script
+    script: .travis/master.sh
+    on:
+      branch: master
+      condition: $CAN_AFTER_SUCCESS == "true"
+  - provider: script
+    script: .travis/tagged.sh
     on:
       tags: true
-      branch: master
       condition: $CAN_AFTER_SUCCESS == "true"
