@@ -19,18 +19,18 @@ script:
   - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 deploy:
   - provider: script
-    script: .travis/always.sh
+    script: bash .travis/always.sh
     skip_cleanup: true
     on:
       all_branches: true
       condition: $CAN_AFTER_SUCCESS == "true"
   - provider: script
-    script: .travis/master.sh
+    script: bash .travis/master.sh
     on:
       branch: master
       condition: $CAN_AFTER_SUCCESS == "true"
   - provider: script
-    script: .travis/tagged.sh
+    script: bash .travis/tagged.sh
     on:
       tags: true
       condition: $CAN_AFTER_SUCCESS == "true"
