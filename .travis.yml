@@ -21,6 +21,7 @@ deploy:
   - provider: script
     script: .travis/always.sh
     on:
+      all_branches: true
       condition: $CAN_AFTER_SUCCESS == "true"
   - provider: script
     script: .travis/master.sh
