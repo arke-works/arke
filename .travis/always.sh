@@ -1,3 +1,1 @@
-go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 bash <(curl -s https://codecov.io/bash)
-rm coverage.txt
