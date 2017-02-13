@@ -2,12 +2,14 @@ sudo: false
 language: go
 go:
   - 1.7
-  - 1.8
+  - go1.8rc3
   - master
 matrix:
   allow_failures:
     - go: master
-    - go: 1.8
+  include:
+    - go: go1.8rc3
+      env: CAN_AFTER_SUCCESS=true
   fast_finish: true
 install:
   - # Do nothing. This is needed to prevent default install action "go get -t -v ./..." from happening here (we want it to happen inside script step).
@@ -17,17 +19,19 @@ script:
   - go tool vet .
   - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then
-      CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o arke-forum .;
-      docker build -t arkeworks/arke .; 
-      docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-      docker push arkeworks/arke;
-      fi
-  - if [ -n "$TRAVIS_TAG" ]; then
-      CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o arke-forum .;
-      docker build -t arkeworks/arke:$TRAVIS_TAG .;
-      docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-      docker push arkeworks/arke:$TRAVIS_TAG;
-      bash <(curl -s https://raw.githubusercontent.com/goreleaser/get/master/latest);
+  - if ["${CAN_AFTER_SUCCESS}" = "true" ]; then
+      bash <(curl -s https://codecov.io/bash)
+      if [ "$TRAVIS_BRANCH" == "master" ]; then
+        CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o arke-forum .;
+        docker build -t arkeworks/arke .; 
+        docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+        docker push arkeworks/arke;
+        fi
+      if [ -n "$TRAVIS_TAG" ]; then
+        CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o arke-forum .;
+        docker build -t arkeworks/arke:$TRAVIS_TAG .;
+        docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+        docker push arkeworks/arke:$TRAVIS_TAG;
+        bash <(curl -s https://raw.githubusercontent.com/goreleaser/get/master/latest);
+        fi
       fi
