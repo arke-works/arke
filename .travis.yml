@@ -2,12 +2,13 @@ sudo: false
 language: go
 go:
   - 1.7
-  - 1.8
   - master
 matrix:
   allow_failures:
     - go: master
-    - go: 1.8
+  include:
+    - go: go1.8rc3
+      env: CAN_AFTER_SUCCESS=true
   fast_finish: true
 install:
   - # Do nothing. This is needed to prevent default install action "go get -t -v ./..." from happening here (we want it to happen inside script step).
@@ -15,4 +16,21 @@ script:
   - go get -t -v ./...
   - diff -u <(echo -n) <(gofmt -d -s .)
   - go tool vet .
-  - go test -v -race ./...
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+deploy:
+  - provider: script
+    script: bash .travis/always.sh
+    skip_cleanup: true
+    on:
+      all_branches: true
+      condition: $CAN_AFTER_SUCCESS == "true"
+  - provider: script
+    script: bash .travis/master.sh
+    on:
+      branch: master
+      condition: $CAN_AFTER_SUCCESS == "true"
+  - provider: script
+    script: bash .travis/tagged.sh
+    on:
+      tags: true
+      condition: $CAN_AFTER_SUCCESS == "true"

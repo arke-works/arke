@@ -1,0 +1,10 @@
+release:
+  repo: arke-works/arke
+build:
+  binary_name: arke-forum
+  goarch:
+    - amd64
+  goos:
+    - windows
+    - darwin
+    - linux
