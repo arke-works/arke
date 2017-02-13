@@ -56,7 +56,7 @@ func TestEncodedToID(t *testing.T) {
 	assert.EqualValues(3414442, id)
 }
 
-func TestIDtoEncoded(t *testing.T) {
+func TestIDToEncoded(t *testing.T) {
 	assert := assert.New(t)
 
 	assert.EqualValues("JVzh", IDToEncoded(3414442))
