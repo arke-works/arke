@@ -28,13 +28,11 @@ func TestGenerator_NewID(t *testing.T) {
 	generator.InstanceID = -2
 
 	_, err = generator.NewID()
-	assert.Error(err)
 	assert.Equal(err, ErrBadInstance)
 
 	generator.StartTime = time.Now().Unix() + 10000
 
 	_, err = generator.NewID()
-	assert.Error(err)
 	assert.Equal(err, ErrNoFuture)
 }
 
@@ -61,5 +59,5 @@ func TestEncodedToID(t *testing.T) {
 func TestIDtoEncoded(t *testing.T) {
 	assert := assert.New(t)
 
-	assert.EqualValues("JVzh", IDtoEncoded(3414442))
+	assert.EqualValues("JVzh", IDToEncoded(3414442))
 }

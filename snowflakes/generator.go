@@ -82,8 +82,8 @@ func (g *Generator) NewID() (int64, error) {
 	return flake, nil
 }
 
-// IDtoEncoded encodes an incoming ID to a Base58 string
-func IDtoEncoded(id int64) string {
+// IDToEncoded encodes an incoming ID to a Base58 string
+func IDToEncoded(id int64) string {
 	return base58.StdEncoding.Encode(uint64(id))
 }
 
