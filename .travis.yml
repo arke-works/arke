@@ -26,11 +26,13 @@ deploy:
       condition: $CAN_AFTER_SUCCESS == "true"
   - provider: script
     script: bash .travis/master.sh
+    skip_cleanup: true
     on:
       branch: master
       condition: $CAN_AFTER_SUCCESS == "true"
   - provider: script
     script: bash .travis/tagged.sh
+    skip_cleanup: true
     on:
       tags: true
       condition: $CAN_AFTER_SUCCESS == "true"
