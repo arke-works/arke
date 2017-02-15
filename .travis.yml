@@ -3,6 +3,8 @@ language: go
 go:
   - 1.7
   - master
+services:
+  - docker
 matrix:
   allow_failures:
     - go: master
