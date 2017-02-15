@@ -14,11 +14,11 @@ matrix:
       env: CAN_AFTER_SUCCESS=true
   fast_finish: true
 install:
-  - go get github.com/kardianos/govendor
+  - go get github.com/kardianos/govendor github.com/golang/lint/golint
 script:
-  - diff -u <(echo -n) <(govendor fmt +local -d -s .)
-  - govendor vet +local .
-  - govendor test +local -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - golint -set_exit_status $(govendor list -no-status +local)
+  - govendor vet +local
+  - govendor test -v -race +local
 deploy:
   - provider: script
     script: bash .travis/always.sh
