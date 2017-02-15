@@ -3,6 +3,9 @@ language: go
 go:
   - 1.7
   - master
+go_import_path: iris.arke.works/forum
+services:
+  - docker
 matrix:
   allow_failures:
     - go: master
@@ -11,12 +14,11 @@ matrix:
       env: CAN_AFTER_SUCCESS=true
   fast_finish: true
 install:
-  - # Do nothing. This is needed to prevent default install action "go get -t -v ./..." from happening here (we want it to happen inside script step).
+  - go get github.com/kardianos/govendor github.com/golang/lint/golint
 script:
-  - go get -t -v ./...
-  - diff -u <(echo -n) <(gofmt -d -s .)
-  - go tool vet .
-  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - golint -set_exit_status $(govendor list -no-status +local)
+  - govendor vet +local
+  - govendor test -v -race +local
 deploy:
   - provider: script
     script: bash .travis/always.sh
