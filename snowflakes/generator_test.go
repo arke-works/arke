@@ -17,23 +17,23 @@ func TestGenerator_NewID(t *testing.T) {
 	assert.NoError(err)
 	assert.True(id > 0)
 
-	lastId := id
+	lastID := id
 	for i := 0; i < 30000; i++ {
 		id, err := generator.NewID()
 		assert.NoError(err)
-		assert.True(id > lastId)
-		lastId = id
+		assert.True(id > lastID)
+		lastID = id
 	}
 
 	generator.InstanceID = -2
 
 	_, err = generator.NewID()
-	assert.Equal(err, ErrBadInstance)
+	assert.Equal(err, errBadInstance)
 
 	generator.StartTime = time.Now().Unix() + 10000
 
 	_, err = generator.NewID()
-	assert.Equal(err, ErrNoFuture)
+	assert.Equal(err, errNoFuture)
 }
 
 func BenchmarkGenerator_NewID(b *testing.B) {
