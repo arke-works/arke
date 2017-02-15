@@ -3,6 +3,7 @@ language: go
 go:
   - 1.7
   - master
+go_import_path: iris.arke.works/forum
 services:
   - docker
 matrix:
@@ -13,8 +14,9 @@ matrix:
       env: CAN_AFTER_SUCCESS=true
   fast_finish: true
 install:
-  - # Do nothing. This is needed to prevent default install action "go get -t -v ./..." from happening here (we want it to happen inside script step).
+  - go install github.com/kardianos/govendor
 script:
+  - govendor fmt +vendor
   - diff -u <(echo -n) <(gofmt -d -s .)
   - go tool vet .
   - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
