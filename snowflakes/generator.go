@@ -14,7 +14,7 @@ const (
 )
 
 var (
-	errNoFuture    = errors.New("Start Time cannot be set in the future.")
+	errNoFuture    = errors.New("Start Time cannot be set in the future")
 	errBadInstance = errors.New("Instance ID must be smaller than 129")
 )
 
