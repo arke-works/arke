@@ -46,10 +46,10 @@ func (g *Generator) NewID() (int64, error) {
 		g.mutex = new(sync.Mutex)
 	}
 	if g.StartTime > time.Now().Unix() {
-		return 0, ErrNoFuture
+		return 0, errNoFuture
 	}
 	if g.InstanceID < 0 {
-		return 0, ErrBadInstance
+		return 0, errBadInstance
 	}
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
@@ -76,7 +76,7 @@ func (g *Generator) NewID() (int64, error) {
 
 	flake = int64(
 		((now - g.StartTime) << (instanceLen + counterLen)) |
-			(int64(g.sequence) << (cnstanceLen)) |
+			(int64(g.sequence) << (instanceLen)) |
 			(int64(g.InstanceID)))
 
 	return flake, nil

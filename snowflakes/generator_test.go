@@ -28,12 +28,12 @@ func TestGenerator_NewID(t *testing.T) {
 	generator.InstanceID = -2
 
 	_, err = generator.NewID()
-	assert.Equal(err, ErrBadInstance)
+	assert.Equal(err, errBadInstance)
 
 	generator.StartTime = time.Now().Unix() + 10000
 
 	_, err = generator.NewID()
-	assert.Equal(err, ErrNoFuture)
+	assert.Equal(err, errNoFuture)
 }
 
 func BenchmarkGenerator_NewID(b *testing.B) {
