@@ -16,10 +16,9 @@ matrix:
 install:
   - go get github.com/kardianos/govendor
 script:
-  - govendor fmt +vendor
-  - diff -u <(echo -n) <(gofmt -d -s .)
-  - go tool vet .
-  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - diff -u <(echo -n) <(govendor fmt +local -d -s .)
+  - govendor vet +local .
+  - govendor test +local -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 deploy:
   - provider: script
     script: bash .travis/always.sh
