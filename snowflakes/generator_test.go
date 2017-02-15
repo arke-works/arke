@@ -17,12 +17,12 @@ func TestGenerator_NewID(t *testing.T) {
 	assert.NoError(err)
 	assert.True(id > 0)
 
-	lastId := id
+	lastID := id
 	for i := 0; i < 30000; i++ {
 		id, err := generator.NewID()
 		assert.NoError(err)
-		assert.True(id > lastId)
-		lastId = id
+		assert.True(id > lastID)
+		lastID = id
 	}
 
 	generator.InstanceID = -2

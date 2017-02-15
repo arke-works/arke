@@ -8,14 +8,14 @@ import (
 )
 
 const (
-	CounterLen  = 13
-	InstanceLen = 7
-	CounterMask = -1 ^ (-1 << CounterLen)
+	counterLen  = 13
+	instanceLen = 7
+	counterMask = -1 ^ (-1 << counterLen)
 )
 
 var (
-	ErrNoFuture    = errors.New("Start Time cannot be set in the future.")
-	ErrBadInstance = errors.New("Instance ID must be smaller than 129")
+	errNoFuture    = errors.New("Start Time cannot be set in the future.")
+	errBadInstance = errors.New("Instance ID must be smaller than 129")
 )
 
 // Generator is a fountain for new snowflakes. StartTime must be
@@ -61,7 +61,7 @@ func (g *Generator) NewID() (int64, error) {
 	now = int64(time.Now().Unix())
 
 	if now == g.now {
-		g.sequence = (g.sequence + 1) & CounterMask
+		g.sequence = (g.sequence + 1) & counterMask
 		if g.sequence == 0 {
 			for now <= g.now {
 				now = int64(time.Now().Unix())
@@ -75,8 +75,8 @@ func (g *Generator) NewID() (int64, error) {
 	g.now = now
 
 	flake = int64(
-		((now - g.StartTime) << (InstanceLen + CounterLen)) |
-			(int64(g.sequence) << (InstanceLen)) |
+		((now - g.StartTime) << (instanceLen + counterLen)) |
+			(int64(g.sequence) << (cnstanceLen)) |
 			(int64(g.InstanceID)))
 
 	return flake, nil
