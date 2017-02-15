@@ -14,7 +14,7 @@ matrix:
       env: CAN_AFTER_SUCCESS=true
   fast_finish: true
 install:
-  - go install github.com/kardianos/govendor
+  - go get github.com/kardianos/govendor
 script:
   - govendor fmt +vendor
   - diff -u <(echo -n) <(gofmt -d -s .)
