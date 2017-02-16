@@ -3,10 +3,11 @@ package cmd // import "iris.arke.works/forum/cmd"
 import (
 	"database/sql"
 	"fmt"
+	// Import lib/pq for postgres support
 	_ "github.com/lib/pq"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/uber-go/zap"
+	"go.uber.org/zap"
 	"iris.arke.works/forum/db/mig"
 	"sync"
 )
@@ -24,7 +25,11 @@ func init() {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	log := zap.New(zap.NewTextEncoder())
+	log, err := zap.NewProduction()
+	if err != nil {
+		println("Error while creating logger:", err)
+		return
+	}
 	dbconf := viper.Sub("db.postgres")
 	connString := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s",
 		dbconf.GetString("user"),
@@ -98,7 +103,7 @@ func run(cmd *cobra.Command, args []string) {
 	log.Info("Starting Migration", zap.Int("unit_num", migGraph.RemainingSize()))
 	hasErrored := false
 	for nodes := migGraph.GetAllRunnableNodes(); len(nodes) > 0 && !hasErrored; nodes = migGraph.GetAllRunnableNodes() {
-		log.Info("Executing Round", zap.Int("unit_num", len(nodes)), zap.Object("nodes", nodes))
+		log.Info("Executing Round", zap.Int("unit_num", len(nodes)), zap.Strings("nodes", nodes))
 		wg := sync.WaitGroup{}
 		wg.Add(len(nodes))
 		for _, v := range nodes {
@@ -145,7 +150,7 @@ func run(cmd *cobra.Command, args []string) {
 		}
 		// Check if the graph is still shrinkable
 		if migGraph.IsStuck() {
-			log.Fatal("Migration got stuck on nodes", zap.Object("nodes", nodes))
+			log.Fatal("Migration got stuck on nodes", zap.Strings("nodes", nodes))
 			return
 		}
 

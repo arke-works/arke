@@ -1,7 +1,7 @@
 sudo: false
 language: go
 go:
-  - 1.7
+  - 1.8
   - master
 go_import_path: iris.arke.works/forum
 services:
@@ -10,7 +10,7 @@ matrix:
   allow_failures:
     - go: master
   include:
-    - go: go1.8rc3
+    - go: go1.8
       env: CAN_AFTER_SUCCESS=true
   fast_finish: true
 service:

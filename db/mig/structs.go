@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// Unit contains the definition of a migration unit that is represented by a node in a DAG
 type Unit struct {
 	Name        string     `yaml:"-"`
 	Description string     `yaml:"description"`
@@ -17,6 +18,8 @@ type Unit struct {
 	executed bool
 }
 
+// DependsOnWithoutNothing returns the list of dependencies that are not "nothing"
+// Normally a unit should not depend on the "nothing" unit if it has other dependencies.
 func (u Unit) DependsOnWithoutNothing() []string {
 	var deps = u.DependsOn
 	var retDeps = []string{}
@@ -28,15 +31,21 @@ func (u Unit) DependsOnWithoutNothing() []string {
 	return retDeps
 }
 
+// SQLSection defines the SQLQueries for various dialects. At the moment only postgres is implemented
+// since a graph-based migration requires a DDL-level transaction to be safe
 type SQLSection struct {
+	// Postgres contains the PG/SQL string to be executed for the unit
 	Postgres string `yaml:"postgres"`
 }
 
+// UnitType defines how a unit is treated on the graph
 type UnitType string
 
 const (
-	UnitTypeMigration     UnitType = "migration"
-	UnitTypeVirtualTarget          = "target"
+	// UnitTypeMigration defines a migration unit which executed SQLCode
+	UnitTypeMigration UnitType = "migration"
+	// UnitTypeVirtualTarget defines a target unit which groups various units together without executing code
+	UnitTypeVirtualTarget = "target"
 )
 
 var nothingUnit = Unit{
