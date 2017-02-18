@@ -29,13 +29,20 @@ const getExecutedQuery = `SELECT name FROM vape_migrations WHERE type=$1;`
 
 // PostgresDialect implements a Postgres compatible interface to perform database migration using the mig toolkit
 type PostgresDialect struct {
-	db *sql.DB
+	db minimalDB
+}
+
+type minimalDB interface {
+	Ping() error
+	Begin() (*sql.Tx, error)
+	Exec(string, ...interface{}) (sql.Result, error)
+	Query(string, ...interface{}) (*sql.Rows, error)
 }
 
 // OpenFromPGConn accepts a opened database connections and wraps it into the PostgresDialect
 func OpenFromPGConn(db *sql.DB) *PostgresDialect {
 	return &PostgresDialect{
-		db: db,
+		db: minimalDB(db),
 	}
 }
 

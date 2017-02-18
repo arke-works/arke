@@ -63,7 +63,7 @@ var nothingUnit = Unit{
 // It accepts a basepath and a filename which are joined together. The filename should be relative
 // to the basepath and acts as a unitname.
 // The filename must end in either .mig or .trgt
-func loadUnitFile(basepath, filename string) (*Unit, error) {
+var loadUnitFile = func(basepath, filename string) (*Unit, error) {
 	var retUnit = &Unit{}
 
 	if !strings.HasSuffix(filename, ".yaml") {

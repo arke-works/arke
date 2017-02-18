@@ -1,6 +1,7 @@
 package mig // import "iris.arke.works/forum/db/mig"
 
 import (
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -15,6 +16,15 @@ func TestMigrations(t *testing.T) {
 	assert.NoError(graph.Load("arke"))
 
 	assert.NoError(graph.ValidateNodes())
+
+	oldLoad := loadUnitFile
+	loadUnitFile = func(string, string) (*Unit, error) {
+		return nil, errors.New("Test")
+	}
+
+	assert.Error(graph.Load("arke"))
+
+	loadUnitFile = oldLoad
 }
 
 func TestGraph_GetUnit(t *testing.T) {
@@ -210,6 +220,11 @@ func TestGraph_GetTargetSubgraph(t *testing.T) {
 		Type:      UnitTypeMigration,
 	}
 
+	graph.nodes["target-faulty-dep"] = &Unit{
+		Name:      "target-faulty-dep",
+		DependsOn: []string{"does-not-exist"},
+		Type:      UnitTypeVirtualTarget,
+	}
 	subGraph, err := graph.GetTargetSubgraph("default2")
 
 	assert.NoError(err)
@@ -225,6 +240,10 @@ func TestGraph_GetTargetSubgraph(t *testing.T) {
 	assert.Error(err)
 
 	_, err = graph.GetTargetSubgraph("default3")
+
+	assert.Error(err)
+
+	_, err = graph.GetTargetSubgraph("target-faulty-dep")
 
 	assert.Error(err)
 }

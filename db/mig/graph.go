@@ -172,13 +172,13 @@ func (g *Graph) GetTargetSubgraph(targetName string) (*Graph, error) {
 	var searchSet = target.DependsOn
 	for len(searchSet) > 0 {
 		node, ok := g.nodes[searchSet[0]]
+		if !ok {
+			return nil, fmt.Errorf("Node %s wanted by target but does not exist", searchSet[0])
+		}
 		if len(searchSet) > 1 {
 			searchSet = searchSet[1:]
 		} else {
 			searchSet = []string{}
-		}
-		if !ok {
-			return nil, fmt.Errorf("Node %s wanted by target but does not exist", searchSet[0])
 		}
 		newGraph.nodes[node.Name] = node
 		searchSet = append(searchSet, node.DependsOnWithoutNothing()...)
