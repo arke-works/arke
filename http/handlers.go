@@ -4,6 +4,7 @@ import (
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/render"
 	"go.uber.org/zap"
+	"io/ioutil"
 	"iris.arke.works/forum/snowflakes"
 	"net/http"
 )
@@ -121,4 +122,70 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+}
+
+func postHandler(w http.ResponseWriter, r *http.Request) {
+	log, err := getLog(r)
+	if err != nil {
+		errorWriter(w, r, http.StatusInternalServerError, err)
+	}
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	var (
+		resourceEP      ResourceEndpoint
+		resourceName    string
+		resourceFactory ResourceFactory
+		fountain        snowflakes.Fountain
+		ok              bool
+	)
+
+	fountain, ok = r.Context().Value(ctxFountainKey).(snowflakes.Fountain)
+	if !ok || fountain == nil {
+		errorStringWriter(w, r, http.StatusInternalServerError, "No ID Fountain")
+	}
+
+	resourceName = chi.URLParam(r, "resource")
+	if resourceEP, ok = resourceEndpoints[resourceName]; !ok {
+		log.Warn("Resource not found", zap.String("resource-name", resourceName))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	if resourceFactory, ok = resources[resourceName]; !ok {
+		log.Warn("ResourceFactory not found", zap.String("resource-name", resourceName))
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	if newRes, ok := resourceEP.(ResourceEndpointNew); ok {
+		res, err := resourceFactory(fountain)
+		if err != nil {
+			errorWriter(w, r, http.StatusInternalServerError, err)
+			return
+		}
+		reqData, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			errorWriter(w, r, http.StatusBadRequest, err)
+			return
+		}
+		defer r.Body.Close()
+		err = res.UnmarshalJSON(reqData)
+		if err != nil {
+			errorWriter(w, r, http.StatusBadRequest, err)
+			return
+		}
+		err = res.StripReadOnly()
+		if err != nil {
+			errorWriter(w, r, http.StatusInternalServerError, err)
+			return
+		}
+		err = newRes.New(res)
+		if err != nil {
+			errorWriter(w, r, http.StatusInternalServerError, err)
+			return
+		}
+		render.JSON(w, r, newRes)
+		return
+	}
+	errorStringWriter(w, r, http.StatusBadRequest, "The requested resource is not creatable")
 }

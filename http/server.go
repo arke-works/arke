@@ -5,6 +5,7 @@ import (
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/middleware"
 	"go.uber.org/zap"
+	"iris.arke.works/forum/snowflakes"
 	"net"
 	"net/http"
 	"os"
@@ -18,6 +19,10 @@ import (
 // caused by the http server itself and the former is used to signal shutdown
 func Start(addr *net.TCPAddr, log *zap.Logger) (chan<- struct{}, <-chan error) {
 	router := chi.NewRouter()
+	fountain := &snowflakes.Generator{
+		InstanceID: 1,
+		StartTime:  time.Date(2017, 02, 18, 17, 03, 33, 0, time.UTC).Unix(),
+	}
 
 	router.Use(middleware.Recoverer,
 		middleware.RequestID,
@@ -26,6 +31,7 @@ func Start(addr *net.TCPAddr, log *zap.Logger) (chan<- struct{}, <-chan error) {
 		middleware.RedirectSlashes)
 
 	router.Use(loggerMiddleware(log))
+	router.Use(fountainMiddleware(fountain))
 	router.Use(paginate)
 
 	router.Route("/api/v1", func(r chi.Router) {

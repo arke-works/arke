@@ -6,6 +6,7 @@ import (
 	"github.com/pressly/chi/middleware"
 	"github.com/pressly/chi/render"
 	"go.uber.org/zap"
+	"iris.arke.works/forum/snowflakes"
 	"net/http"
 	"strconv"
 )
@@ -16,6 +17,7 @@ const (
 	ctxLoggerKey ctxKey = iota
 	ctxPageKey
 	ctxSizeKey
+	ctxFountainKey
 )
 
 func loggerMiddleware(log *zap.Logger) func(http.Handler) http.Handler {
@@ -27,6 +29,14 @@ func loggerMiddleware(log *zap.Logger) func(http.Handler) http.Handler {
 			r = r.WithContext(context.WithValue(r.Context(), ctxLoggerKey, reqLog))
 
 			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+func fountainMiddleware(fountain snowflakes.Fountain) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			r = r.WithContext(context.WithValue(r.Context(), ctxFountainKey, fountain))
 		})
 	}
 }
