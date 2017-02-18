@@ -30,7 +30,11 @@ func Start(addr *net.TCPAddr, log *zap.Logger) (chan<- struct{}, <-chan error) {
 
 	router.Route("/api/v1", func(r chi.Router) {
 		r.Get("/:resource/:snowflake", getHandler)
+		r.Get("/:resource", getHandler)
+		r.Head("/:resource/:snowflake", getHandler)
+		r.Head("/:resource", getHandler)
 		r.Options("/:resource", optionHandler)
+		r.Options("/:resource/:unused", optionHandler)
 	})
 
 	server := &http.Server{

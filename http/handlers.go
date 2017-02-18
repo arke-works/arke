@@ -4,8 +4,8 @@ import (
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/render"
 	"go.uber.org/zap"
+	"iris.arke.works/forum/snowflakes"
 	"net/http"
-	"strconv"
 )
 
 func optionHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,21 +28,27 @@ func optionHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	log.Debug("Checking for resource options")
 	var methods = http.MethodOptions
 	if _, ok := resourceEP.(ResourceEndpointNew); ok {
+		log.Debug("Resource has POST Method")
 		methods = methods + "," + http.MethodPost
 	}
 	if _, ok := resourceEP.(ResourceEndpointFind); ok {
+		log.Debug("Resource has GET/HEAD Method")
 		methods = methods + "," + http.MethodGet + "," + http.MethodHead
 	}
 	if _, ok := resourceEP.(ResourceEndpointUpdate); ok {
+		log.Debug("Resource has PUT/PATCH method")
 		methods = methods + "," + http.MethodPut + "," + http.MethodPatch
 	}
 	if _, ok := resourceEP.(ResourceEndpointDelete); ok {
+		log.Debug("Resource has DELETE method")
 		methods = methods + "," + http.MethodDelete
 	}
-	w.WriteHeader(http.StatusOK)
 	w.Header().Add("Allow", methods)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte{})
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +73,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 		resourceIDString := chi.URLParam(r, "snowflake")
 		resourceID = -1
 		if resourceIDString != "" {
-			resourceID, err = strconv.ParseInt(resourceIDString, 10, 63)
+			resourceID, err = snowflakes.EncodedToID(resourceIDString)
 			if err != nil {
 				errorWriter(w, r, http.StatusInternalServerError, err)
 				return
@@ -97,6 +103,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			render.JSON(w, r, resource)
+			return
 		} else if resourceID == -1 {
 			page, size := r.Context().Value(ctxPageKey).(int64), r.Context().Value(ctxSizeKey).(int64)
 			resources, err := find.FindAll(page, size)
@@ -105,10 +112,13 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			render.JSON(w, r, resources)
+			return
 		}
 		errorStringWriter(w, r, http.StatusInternalServerError, "The requested resource ID is not valid")
+		return
 	} else {
 		errorStringWriter(w, r, http.StatusBadRequest, "The requested resource is not readable")
+		return
 	}
 
 }

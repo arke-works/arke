@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"errors"
-	"github.com/pressly/chi"
 	"github.com/pressly/chi/middleware"
 	"github.com/pressly/chi/render"
 	"go.uber.org/zap"
@@ -47,8 +46,8 @@ func paginate(next http.Handler) http.Handler {
 			err        error
 		)
 		page, size = 1, 25
-		pageString := chi.URLParam(r, "page")
-		sizeString := chi.URLParam(r, "size")
+		pageString := r.URL.Query().Get("page")
+		sizeString := r.URL.Query().Get("size")
 
 		if pageString != "" {
 			page, err = strconv.ParseInt(pageString, 10, 63)

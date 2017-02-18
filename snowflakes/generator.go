@@ -31,6 +31,12 @@ type Generator struct {
 	now        int64
 }
 
+// Fountain is an interface that should be used to pass generators around
+// to improve code portability
+type Fountain interface {
+	NewID() (int64, error)
+}
+
 // NewID generates a new, unique snowflake value
 //
 // Up to 8192 snowflakes per second can be requested
