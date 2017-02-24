@@ -9,6 +9,10 @@ import (
 	"net/http"
 )
 
+func denyHandler(w http.ResponseWriter, r *http.Request) {
+	errorStringWriter(w, r, http.StatusMethodNotAllowed, "Method not allowed")
+}
+
 func optionHandler(w http.ResponseWriter, r *http.Request) {
 	log, err := getLog(r)
 	if err != nil {
@@ -158,7 +162,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if newRes, ok := resourceEP.(ResourceEndpointNew); ok {
-		res, err := resourceFactory(fountain)
+		res, err := resourceFactory(nil)
 		if err != nil {
 			errorWriter(w, r, http.StatusInternalServerError, err)
 			return
@@ -179,7 +183,13 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 			errorWriter(w, r, http.StatusInternalServerError, err)
 			return
 		}
-		err = newRes.New(res)
+		storeResource, err := resourceFactory(fountain)
+		if err != nil {
+			errorWriter(w, r, http.StatusInternalServerError, err)
+			return
+		}
+		storeResource.Merge(res)
+		err = newRes.New(storeResource)
 		if err != nil {
 			errorWriter(w, r, http.StatusInternalServerError, err)
 			return
@@ -188,4 +198,50 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	errorStringWriter(w, r, http.StatusBadRequest, "The requested resource is not creatable")
+}
+
+func deleteHandler(w http.ResponseWriter, r *http.Request) {
+	log, err := getLog(r)
+	if err != nil {
+		errorWriter(w, r, http.StatusInternalServerError, err)
+		return
+	}
+	if r.Method != http.MethodDelete {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	var (
+		resourceEP ResourceEndpoint
+		resourceID int64
+		resourceName string
+		ok bool
+	)
+	resourceName = chi.URLParam(r, "resource")
+	{
+		resourceIDString := chi.URLParam(r, "snowflake")
+		resourceID = -1
+		if resourceIDString != "" {
+			resourceID, err = snowflakes.EncodedToID(resourceIDString)
+			if err != nil {
+				errorWriter(w, r, http.StatusInternalServerError, err)
+				return
+			}
+		}
+	}
+
+	if resourceEP, ok = resourceEndpoints[resourceName]; !ok {
+		log.Warn("Resource not found", zap.String("resource-name", resourceName))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if del, ok := resourceEP.(ResourceEndpointDelete); ok {
+		if resourceID >= 0 {
+			del.SoftDelete(resourceID)
+		} else {
+			del.HardDelete(resourceID * -1)
+		}
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 }

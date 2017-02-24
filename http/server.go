@@ -41,6 +41,14 @@ func Start(addr *net.TCPAddr, log *zap.Logger) (chan<- struct{}, <-chan error) {
 		r.Head("/:resource", getHandler)
 		r.Options("/:resource", optionHandler)
 		r.Options("/:resource/:unused", optionHandler)
+		r.Post("/:resource", postHandler)
+		r.Post("/:resource/:unused", denyHandler)
+		r.Delete("/:resource/", denyHandler)
+		r.Delete("/:resource/:snowflake", deleteHandler)
+		r.Put("/:resource/", denyHandler)
+		r.Put("/:resource/:snowflake", denyHandler)
+		r.Patch("/:resource/", denyHandler)
+		r.Patch("/:resource/:swowflake", denyHandler)
 	})
 
 	server := &http.Server{

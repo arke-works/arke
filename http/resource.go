@@ -1,13 +1,32 @@
 package http
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"errors"
+)
+
+var (
+	// ErrMergeTypeMismatch indicates that a merge failed because the incoming type
+	// was not the same as the expected resource type
+	ErrMergeTypeMismatch = errors.New("Type mismatch during merge operation")
+)
 
 // Resource is a generic interface for objects to be represented in a REST API
 type Resource interface {
 	Snowflake() int64
 	Type() string
 	// StripReadOnly defaults or zeroes all fields that should not be accessible to userinput
+	// This will usually be called before writing data into the database
 	StripReadOnly() error
+
+	// Merge will overwrite all fields of the current resource with those of the specified
+	// resource that are not of a null value
+	//
+	// If nil is provided, it should take no action and return no error
+	//
+	// The incoming resource **must** be type checked, if the types mismatch, no merging
+	// is to take place. If this is the case, the error ErrMergeTypeMismatch must be returned
+	Merge(Resource) error
 
 	// A Resource MUST implement JSON Marshaler and Unmarshaler
 	json.Marshaler
@@ -41,12 +60,11 @@ type ResourceEndpointFind interface {
 // should overwrite existing fields
 //
 // Replace refers to supplying a full Resource where the given object should completely replace the existing one
-// (minus any fields cleared by StripReadOnly)
 type ResourceEndpointUpdate interface {
 	ResourceEndpoint
 
-	Merge(Resource, Resource) (Resource, error)
-	Replace(Resource, Resource) (Resource, error)
+	Merge(int64, Resource) (Resource, error)
+	Replace(int64, Resource) (Resource, error)
 }
 
 // ResourceEndpointDelete defines an interface for deleting an object
@@ -59,6 +77,6 @@ type ResourceEndpointUpdate interface {
 type ResourceEndpointDelete interface {
 	ResourceEndpoint
 
-	SoftDelete(Resource) error
-	HardDelete(Resource) error
+	SoftDelete(int64) error
+	HardDelete(int64) error
 }
