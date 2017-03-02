@@ -1,4 +1,4 @@
-package http
+package resources
 
 import (
 	"errors"
@@ -41,4 +41,26 @@ func makeResource(name string, fountain snowflakes.Fountain) (Resource, error) {
 		return nil, errors.New("Resource not registered")
 	}
 	return resources[name](fountain)
+}
+
+func GetResource(name string, fountain snowflakes.Fountain) (Resource, error) {
+	if v, err := GetResourceFactory(name); err != nil {
+		return v(fountain)
+	} else {
+		return nil, err
+	}
+}
+
+func GetEndpoint(name string) (ResourceEndpoint, error) {
+	if v, ok := resourceEndpoints[name]; ok {
+		return v, nil
+	}
+	return nil, errors.New("Endpoint not registered")
+}
+
+func GetResourceFactory(name string) (ResourceFactory, error) {
+	if v, ok := resources[name]; ok {
+		return v, nil
+	}
+	return nil, errors.New("Resource not registered")
 }

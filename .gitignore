@@ -18,5 +18,3 @@
 
 # Ignore Local Configuration Files
 arke.yaml
-# Ignore the Arke Binary
-arke

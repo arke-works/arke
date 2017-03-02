@@ -1,4 +1,4 @@
-package http
+package resources
 
 import (
 	"encoding/json"
@@ -51,7 +51,11 @@ type ResourceEndpointFind interface {
 	ResourceEndpoint
 
 	Find(snowflake int64) (Resource, error)
-	FindAll(page, size int64) ([]Resource, error)
+
+	// FindAll returns a set of resources around the pivot ID. If the size parameter is positive, all resources
+	// newer (or with higher ID) than the pivot ID must be returned. If the size parameter is negative, all resources
+	// older (or with lower ID) than the pivot ID must be returned.
+	FindAll(pivot, size int64) ([]Resource, error)
 }
 
 // ResourceEndpointUpdate defines an interface for merging or replacing an object

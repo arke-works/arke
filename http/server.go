@@ -5,6 +5,8 @@ import (
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/middleware"
 	"go.uber.org/zap"
+	"iris.arke.works/forum/http/handlers"
+	amiddleware "iris.arke.works/forum/http/middleware"
 	"iris.arke.works/forum/snowflakes"
 	"net"
 	"net/http"
@@ -30,25 +32,25 @@ func Start(addr *net.TCPAddr, log *zap.Logger) (chan<- struct{}, <-chan error) {
 		middleware.DefaultCompress,
 		middleware.RedirectSlashes)
 
-	router.Use(loggerMiddleware(log))
-	router.Use(fountainMiddleware(fountain))
-	router.Use(paginate)
+	router.Use(amiddleware.LoggerMiddleware(log))
+	router.Use(amiddleware.FountainMiddleware(fountain))
+	router.Use(amiddleware.PageMiddleware)
 
 	router.Route("/api/v1", func(r chi.Router) {
-		r.Get("/:resource/:snowflake", getHandler)
-		r.Get("/:resource", getHandler)
-		r.Head("/:resource/:snowflake", getHandler)
-		r.Head("/:resource", getHandler)
-		r.Options("/:resource", optionHandler)
-		r.Options("/:resource/:unused", optionHandler)
-		r.Post("/:resource", postHandler)
-		r.Post("/:resource/:unused", denyHandler)
-		r.Delete("/:resource/", denyHandler)
-		r.Delete("/:resource/:snowflake", deleteHandler)
-		r.Put("/:resource/", denyHandler)
-		r.Put("/:resource/:snowflake", denyHandler)
-		r.Patch("/:resource/", denyHandler)
-		r.Patch("/:resource/:swowflake", denyHandler)
+		r.Get("/:resource/:snowflake", handlers.GetHandler)
+		r.Get("/:resource", handlers.GetHandler)
+		r.Head("/:resource/:snowflake", handlers.GetHandler)
+		r.Head("/:resource", handlers.GetHandler)
+		r.Options("/:resource", handlers.OptionHandler)
+		r.Options("/:resource/:unused", handlers.OptionHandler)
+		r.Post("/:resource", handlers.PostHandler)
+		r.Post("/:resource/:unused", handlers.DenyHandler)
+		r.Delete("/:resource/", handlers.DenyHandler)
+		r.Delete("/:resource/:snowflake", handlers.DeleteHandler)
+		r.Put("/:resource/", handlers.DenyHandler)
+		r.Put("/:resource/:snowflake", handlers.DenyHandler)
+		r.Patch("/:resource/", handlers.DenyHandler)
+		r.Patch("/:resource/:swowflake", handlers.DenyHandler)
 	})
 
 	server := &http.Server{
