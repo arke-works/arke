@@ -34,6 +34,10 @@ func PageMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
+		if size > 25 {
+			size = 25
+		}
+
 		r = r.WithContext(context.WithValue(r.Context(), ctxkeys.CtxPivotIDKey, pivotID))
 		r = r.WithContext(context.WithValue(r.Context(), ctxkeys.CtxSizeKey, size))
 
