@@ -51,14 +51,15 @@ func (g *Generator) NewID() (int64, error) {
 	if g.mutex == nil {
 		g.mutex = new(sync.Mutex)
 	}
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+
 	if g.StartTime > time.Now().Unix() {
 		return 0, errNoFuture
 	}
 	if g.InstanceID < 0 {
 		return 0, errBadInstance
 	}
-	g.mutex.Lock()
-	defer g.mutex.Unlock()
 
 	var (
 		now   int64
@@ -87,6 +88,8 @@ func (g *Generator) NewID() (int64, error) {
 
 	return flake, nil
 }
+
+var _ Fountain = (*Generator)(nil)
 
 // IDToEncoded encodes an incoming ID to a Base58 string
 func IDToEncoded(id int64) string {

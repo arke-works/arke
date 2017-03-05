@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/render"
-	"go.uber.org/zap"
 	"io/ioutil"
 	"iris.arke.works/forum/http/ctxkeys"
 	"iris.arke.works/forum/http/helper"
@@ -13,10 +12,6 @@ import (
 )
 
 func PostHandler(w http.ResponseWriter, r *http.Request) {
-	log, err := helper.GetLog(r)
-	if err != nil {
-		helper.ErrorWriter(w, r, http.StatusInternalServerError, err)
-	}
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -27,23 +22,24 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		resourceFactory resources.ResourceFactory
 		fountain        snowflakes.Fountain
 		ok              bool
+		err             error
 	)
 
 	fountain, ok = r.Context().Value(ctxkeys.CtxFountainKey).(snowflakes.Fountain)
 	if !ok || fountain == nil {
 		helper.ErrorStringWriter(w, r, http.StatusInternalServerError, "No ID Fountain")
+		return
 	}
 
 	resourceName = chi.URLParam(r, "resource")
 	if resourceEP, err = resources.GetEndpoint(resourceName); err != nil {
-		log.Warn("Resource not found", zap.String("resource-name", resourceName))
-		w.WriteHeader(http.StatusNotFound)
+		helper.ErrorWriter(w, r, http.StatusNotFound, err)
 		return
 	}
 
 	if resourceFactory, err = resources.GetResourceFactory(resourceName); err != nil {
-		log.Warn("ResourceFactory not found", zap.String("resource-name", resourceName))
-		w.WriteHeader(http.StatusInternalServerError)
+		helper.ErrorWriter(w, r, http.StatusInternalServerError, err)
+		return
 	}
 
 	if newRes, ok := resourceEP.(resources.ResourceEndpointNew); ok {

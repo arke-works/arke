@@ -9,12 +9,18 @@ import (
 	"net/http"
 )
 
-func GetLog(r *http.Request) (*zap.Logger, error) {
+var GetLog = func(r *http.Request) (*zap.Logger, error) {
 	log, ok := r.Context().Value(ctxkeys.CtxLoggerKey).(*zap.Logger)
 	if !ok {
 		return nil, errors.New("Logger not present")
 	}
 	return log, nil
+}
+
+func SetupTestLog() {
+	GetLog = func(_ *http.Request) (*zap.Logger, error) {
+		return zap.NewDevelopment()
+	}
 }
 
 type errorResponse struct {

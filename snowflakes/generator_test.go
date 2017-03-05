@@ -36,10 +36,40 @@ func TestGenerator_NewID(t *testing.T) {
 	assert.Equal(err, errNoFuture)
 }
 
+func TestSequenceGenerator_NewID(t *testing.T) {
+	assert := assert.New(t)
+	generator := SequenceGenerator{
+		Position: 10,
+	}
+
+	id, err := generator.NewID()
+	assert.NoError(err)
+	assert.True(id > 0)
+
+	lastID := id
+	for i := 0; i < 30000; i++ {
+		id, err := generator.NewID()
+		assert.NoError(err)
+		assert.True(id > lastID)
+		lastID = id
+	}
+}
+
 func BenchmarkGenerator_NewID(b *testing.B) {
 	generator := Generator{
 		StartTime:  time.Date(1998, time.November, 19, 0, 0, 0, 0, time.UTC).Unix(),
 		InstanceID: 18,
+	}
+	b.ResetTimer()
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		generator.NewID()
+	}
+}
+
+func BenchmarkSequenceGenerator_NewID(b *testing.B) {
+	generator := SequenceGenerator{
+		Position: 0,
 	}
 	b.ResetTimer()
 	b.ReportAllocs()

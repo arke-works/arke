@@ -15,16 +15,8 @@ import (
 	"time"
 )
 
-// Start will listen on a given TCP Address/Port and log to a zap.Logger instance.
-//
-// It returns a struct{} and an error channel, the later will return any errors
-// caused by the http server itself and the former is used to signal shutdown
-func Start(addr *net.TCPAddr, log *zap.Logger) (chan<- struct{}, <-chan error) {
+func DefaultRouter(log *zap.Logger, fountain snowflakes.Fountain) *chi.Mux {
 	router := chi.NewRouter()
-	fountain := &snowflakes.Generator{
-		InstanceID: 1,
-		StartTime:  time.Date(2017, 02, 18, 17, 03, 33, 0, time.UTC).Unix(),
-	}
 
 	router.Use(middleware.Recoverer,
 		middleware.RequestID,
@@ -36,22 +28,22 @@ func Start(addr *net.TCPAddr, log *zap.Logger) (chan<- struct{}, <-chan error) {
 	router.Use(amiddleware.FountainMiddleware(fountain))
 	router.Use(amiddleware.PageMiddleware)
 
-	router.Route("/api/v1", func(r chi.Router) {
-		r.Get("/:resource/:snowflake", handlers.GetHandler)
-		r.Get("/:resource", handlers.GetHandler)
-		r.Head("/:resource/:snowflake", handlers.GetHandler)
-		r.Head("/:resource", handlers.GetHandler)
-		r.Options("/:resource", handlers.OptionHandler)
-		r.Options("/:resource/:unused", handlers.OptionHandler)
-		r.Post("/:resource", handlers.PostHandler)
-		r.Post("/:resource/:unused", handlers.DenyHandler)
-		r.Delete("/:resource/", handlers.DenyHandler)
-		r.Delete("/:resource/:snowflake", handlers.DeleteHandler)
-		r.Put("/:resource/", handlers.DenyHandler)
-		r.Put("/:resource/:snowflake", handlers.DenyHandler)
-		r.Patch("/:resource/", handlers.DenyHandler)
-		r.Patch("/:resource/:swowflake", handlers.DenyHandler)
-	})
+	router.Route("/api/v1", handlers.MakeRouter)
+
+	return router
+}
+
+// Start will listen on a given TCP Address/Port and log to a zap.Logger instance.
+//
+// It returns a struct{} and an error channel, the later will return any errors
+// caused by the http server itself and the former is used to signal shutdown
+func Start(addr *net.TCPAddr, log *zap.Logger) (chan<- struct{}, <-chan error) {
+	fountain := &snowflakes.Generator{
+		InstanceID: 1,
+		StartTime:  time.Date(2017, 02, 18, 17, 03, 33, 0, time.UTC).Unix(),
+	}
+
+	router := DefaultRouter(log, fountain)
 
 	server := &http.Server{
 		Addr:    addr.String(),
