@@ -55,6 +55,7 @@ func (u *UserResource) Merge(r Resource) error {
 		if u2.intUser.Email.Valid && u2.intUser.Email.String != "" {
 			u.intUser.Email = u2.intUser.Email
 		}
+		return nil
 	}
 	return errors.New("Merging with incompatible type")
 }

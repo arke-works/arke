@@ -75,7 +75,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			helper.ErrorWriter(w, r, http.StatusInternalServerError, err)
 			return
 		}
-		render.JSON(w, r, newRes)
+		render.JSON(w, r, storeResource)
 		return
 	}
 	helper.ErrorStringWriter(w, r, http.StatusBadRequest, "The requested resource is not creatable")

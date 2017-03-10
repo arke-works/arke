@@ -61,18 +61,18 @@ func TestPostHandler(t *testing.T) {
 	assert.EqualValues(http.StatusNotFound, recorder.Code)
 
 	recorder = httptest.NewRecorder()
-	request = httptest.NewRequest("POST", "/mock", bytes.NewBufferString("{}"))
+	request = httptest.NewRequest("POST", "/mock_nofactory", bytes.NewBufferString("{}"))
 
 	router.ServeHTTP(recorder, request)
 
-	assert.EqualValues("{\"error\":\"Resource was nil\"}\n", recorder.Body.String())
-	assert.EqualValues(http.StatusInternalServerError, recorder.Code)
+	assert.EqualValues("{\"error\":\"Endpoint not registered\"}\n", recorder.Body.String())
+	assert.EqualValues(http.StatusNotFound, recorder.Code)
 
 	recorder = httptest.NewRecorder()
 	request = httptest.NewRequest("POST", "/mock", bytes.NewBuffer(dat))
 
 	router.ServeHTTP(recorder, request)
 
-	assert.EqualValues(string(dat), recorder.Body.String())
+	assert.EqualValues(`{"id_field":1,"text":"","other_text":"Not Stripped","int":-23434,"bytes":"IgD/RA=="}` + "\n", recorder.Body.String())
 	assert.EqualValues(http.StatusOK, recorder.Code)
 }
