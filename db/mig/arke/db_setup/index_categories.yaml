@@ -1,0 +1,6 @@
+description: "Create Category Indices"
+depends_on:
+  - db_setup/create_categories
+sql:
+  postgres: |
+    CREATE INDEX categories_title_index ON categories(title);

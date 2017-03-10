@@ -1,0 +1,18 @@
+description: "Create User Table"
+depends_on:
+  - nothing
+sql:
+  postgres:
+    CREATE TABLE users (
+    	snowflake	bigint		NOT NULL,
+    	created_at	timestamptz	NOT NULL	DEFAULT (now() AT TIME ZONE 'utc'),
+    	deleted_at	timestamptz,
+
+    	username	varchar(1024)	NOT NULL,
+    	email		varchar(1024),
+    	avatar		bytea		NOT NULL,
+
+    	PRIMARY KEY (snowflake),
+    	UNIQUE (email),
+    	UNIQUE (username)
+    );

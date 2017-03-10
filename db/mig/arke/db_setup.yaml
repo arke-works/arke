@@ -1,0 +1,5 @@
+description: Setup the initial DB and indices
+depends_on:
+- db_setup/_create_tables
+- db_setup/_index_tables
+type: target

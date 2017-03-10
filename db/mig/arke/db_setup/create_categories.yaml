@@ -1,0 +1,17 @@
+description: "Create Category Table"
+depends_on:
+  - nothing
+sql:
+  postgres: |
+    CREATE TABLE categories (
+        snowflake	bigint		NOT NULL,
+        created_at	timestamptz	NOT NULL	DEFAULT (now() AT TIME ZONE 'utc'),
+        deleted_at	timestamptz,
+
+        title		varchar(1024)	NOT NULL,
+        description	text,
+        color		int4,
+
+        PRIMARY KEY(snowflake),
+        UNIQUE (title)
+    );

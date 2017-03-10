@@ -1,0 +1,19 @@
+description: Create Topics Table
+depends_on:
+ - db_setup/create_users
+sql:
+  postgres: |
+    CREATE TABLE topics (
+      snowflake	bigint		NOT NULL,
+      created_at	timestamptz	NOT NULL	DEFAULT (now() AT TIME ZONE 'utc'),
+      deleted_at	timestamptz,
+
+      author_id	bigint,
+      title		varchar(1024)	NOT NULL,
+      body		text		NOT NULL,
+      revision	bigint		NOT NULL,
+
+      PRIMARY KEY (snowflake),
+      FOREIGN KEY (author_id) REFERENCES users(snowflake),
+      UNIQUE (snowflake, revision)
+    );

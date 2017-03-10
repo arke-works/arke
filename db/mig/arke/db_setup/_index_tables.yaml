@@ -1,0 +1,12 @@
+description: Create Indices on all Tables
+type: target
+depends_on:
+- db_setup/index_categories
+- db_setup/index_groups
+- db_setup/index_logins
+- db_setup/index_private_messages
+- db_setup/index_rel_topic_categories
+- db_setup/index_rel_user_groups
+- db_setup/index_replies
+- db_setup/index_topics
+- db_setup/index_users

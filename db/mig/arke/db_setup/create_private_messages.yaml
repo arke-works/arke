@@ -1,0 +1,21 @@
+description: Create PM Table
+depends_on:
+- db_setup/create_users
+sql:
+  postgres: |
+    CREATE TABLE private_messages (
+      snowflake	bigint		NOT NULL,
+      created_at	timestamptz	NOT NULL	DEFAULT (now() AT TIME ZONE 'utc'),
+      deleted_at	timestamptz,
+
+      title		varchar(1024)	NOT NULL,
+      body		text		NOT NULL,
+      sender_id	bigint		NOT NULL,
+      receiver_id	bigint		NOT NULL,
+      parent_id	bigint,
+
+      PRIMARY KEY (snowflake),
+      FOREIGN KEY (sender_id) REFERENCES users(snowflake),
+      FOREIGN KEY (receiver_id) REFERENCES users(snowflake),
+      FOREIGN KEY (parent_id) REFERENCES private_messages(snowflake)
+    );
