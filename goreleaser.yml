@@ -1,7 +1,9 @@
 release:
-  repo: arke-works/arke
+  github: 
+    owner: arke-works
+    name: arke
 build:
-  binary_name: arke-forum
+  binary: arke-forum
   goarch:
     - amd64
   goos:
