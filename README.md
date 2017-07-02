@@ -30,7 +30,7 @@ Please refer to [this section](https://github.com/arke-works/arke/blob/master/.g
 # Authors
 
 - Aleksandr Tihomirov [@zet4](https://github.com/zet4) - Project Lead, Backend
-- Luna [@TriggerRimfire](https://github.com/TriggerRimfire) - Frontend Lead
+- Trigger [@TriggerRimfire](https://github.com/TriggerRimfire) - Frontend Lead
 - Tim Schuster [@tscs37](https://github.com/tscs37) - Backend
 - Emily Ekberg [@uppfinnarn](https://github.com/uppfinnarn) - Backend
 - Rachel Clark [@Soliel](https://github.com/Soliel) - Backend, Frontend
